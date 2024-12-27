@@ -56,7 +56,7 @@ module Rails
         end
 
         def webp_file_exists?(digest, output_path)
-          File.exists?(output_path) && digest == output_path.to_s.split('-').last.split('.').first
+          File.exist?(output_path) && digest == output_path.to_s.split('-').last.split('.').first
         end
 
         def logger
