@@ -28,7 +28,7 @@ module Rails
           digest = data_digest(data)
           webp_file = webp_file_name(data, digest)
           output_path = Pathname.new(File.join(app.root, 'public', prefix, webp_file))
-          if WebP.force || !webp_file_exist?(digest, output_path)
+          if WebP.force || !webp_file_exists?(digest, output_path)
             FileUtils.mkdir_p(output_path.dirname) unless Dir.exist?(output_path.dirname)
             # TODO: check app.assets.gzip and act accordingly
             convert_to_webp(input_path, output_path)
