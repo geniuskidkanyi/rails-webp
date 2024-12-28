@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'logger'
-require 'mini_magick'
+require 'vips'
 
 module Rails
   module WebP
@@ -8,18 +8,22 @@ module Rails
       class << self
         attr_reader :context
 
-        def convert_to_webp(input_path, output_path)
-          # Ex: convert wizard.png -quality 50 -define webp:lossless=true wizard.webp
-          MiniMagick::Tool::Convert.new do |convert|
-            convert << input_path
-            options = WebP.encode_options
-            convert << '-quality' << options[:quality]
-            options.except(:quality).each do |name, value|
-              convert << "-define" << "webp:#{name.to_s.dasherize}=#{value}"
-            end
-            convert << output_path
-          end
-        end
+        def convert_to_webp(input_path, output_path, options = {})
+  # Default WebP options
+  default_options = {
+    quality: 50,       # Compression quality (0-100)
+    lossless: false    # Lossless compression
+  }
+  
+  # Merge default options with user-provided options
+  options = default_options.merge(options)
+  
+  # Read the input image
+  image = Vips::Image.new_from_file(input_path)
+
+  # Save the image as WebP with specified options
+  image.write_to_file(output_path, Q: options[:quality], lossless: options[:lossless] ? 1 : 0)
+end
 
         def process(input_path, data, context, app = Rails.application)
           return data if excluded_dir?(input_path)
